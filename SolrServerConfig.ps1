@@ -126,8 +126,13 @@ Configuration SolrServerConfig
 				$cert | Remove-Item
 			}
 			TestScript = {
-				$cert = Get-ChildItem -Path Cert:\LocalMachine\Root -Recurse | Where Subject -match "$using:dns"
-				return  (!$using:useSSL) -or [boolean]$cert
+                if(-Not($using:useSSL)){
+					return $true
+				}
+                else{
+				    $cert = Get-ChildItem -Path Cert:\LocalMachine\Root -Recurse | Where Subject -match "$using:dns"
+				    return  [boolean]$cert
+                }
 			}
 		}
 		
@@ -140,11 +145,12 @@ Configuration SolrServerConfig
 				$cert | Export-PfxCertificate -FilePath $certStore -Password $certpwd | Out-Null
 			}
 			TestScript = {
-				if(!$using:useSSL){
+				if(-Not($using:useSSL)){
 					return $true
 				}
-			
-				return Test-Path -Path "c:\Solr\solr-$using:solrVersion\server\etc\solr-ssl.keystore.pfx"
+			    else{
+				    return Test-Path -Path "c:\Solr\solr-$using:solrVersion\server\etc\solr-ssl.keystore.pfx"
+                }
 			}
 			DependsOn="[Script]GenerateSolrCert"
 		}
@@ -173,11 +179,12 @@ Configuration SolrServerConfig
 				}
 			}
 			TestScript = {
-				if(!$using:useSSL){
+				if(-Not($using:useSSL)){
 					return $true
 				}
-				
-				return Test-Path -Path "c:\Solr\solr-$using:solrVersion\bin\solr.in.cmd.old"
+				else{
+				    return Test-Path -Path "c:\Solr\solr-$using:solrVersion\bin\solr.in.cmd.old"
+                }
 			}
 			DependsOn="[Script]ExportSolrCert"
 		}
@@ -204,11 +211,12 @@ Configuration SolrServerConfig
                 }				
 			}
 			TestScript = {
-				if(!$using:performSchemaUpdates){
+                if(-Not($using:performSchemaUpdates)){
 					return $true
 				}
-				
-				return Test-Path -Path "c:\Solr\solr-$using:solrVersion\server\solr\configsets\sitecore_main"
+				else{
+				    return Test-Path -Path "c:\Solr\solr-$using:solrVersion\server\solr\configsets\sitecore_main"
+                }
 			}
 		}
 		
@@ -234,11 +242,12 @@ Configuration SolrServerConfig
                 }				
 			}
 			TestScript = {
-				if(!$using:performSchemaUpdates){
+				if(-Not($using:performSchemaUpdates)){
 					return $true
 				}
-			
-				return Test-Path -Path "c:\Solr\solr-$using:solrVersion\server\solr\configsets\sitecore_xdb"
+			    else{
+				    return Test-Path -Path "c:\Solr\solr-$using:solrVersion\server\solr\configsets\sitecore_xdb"
+                }
 			}
 		}
 		
@@ -267,11 +276,13 @@ Configuration SolrServerConfig
 				$xml.Save($path)
 			}
 			TestScript = {
-				if(!$using:performSchemaUpdates){
+                Write-Host 'perform schema updates' $using:performSchemaUpdates
+				if(-Not($using:performSchemaUpdates)){
 					return $true
 				}
-				
-				return Test-Path -Path "c:\Solr\solr-$using:solrVersion\server\solr\configsets\sitecore_main\conf\managed-schema.old"
+				else{
+				    return Test-Path -Path "c:\Solr\solr-$using:solrVersion\server\solr\configsets\sitecore_main\conf\managed-schema.old"
+                }
 			}
 		}
 		

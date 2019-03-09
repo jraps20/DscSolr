@@ -140,7 +140,11 @@ Configuration SolrServerConfig
 				$cert | Export-PfxCertificate -FilePath $certStore -Password $certpwd | Out-Null
 			}
 			TestScript = {
-				return (!$using:useSSL) -or (Test-Path -Path "c:\Solr\solr-$using:solrVersion\server\etc\solr-ssl.keystore.pfx")
+				if(!$using:useSSL){
+					return $true
+				}
+			
+				return Test-Path -Path "c:\Solr\solr-$using:solrVersion\server\etc\solr-ssl.keystore.pfx"
 			}
 			DependsOn="[Script]GenerateSolrCert"
 		}
@@ -169,7 +173,11 @@ Configuration SolrServerConfig
 				}
 			}
 			TestScript = {
-				return -Not($using:useSSL) -or (Test-Path -Path "c:\Solr\solr-$using:solrVersion\bin\solr.in.cmd.old")
+				if(!$using:useSSL){
+					return $true
+				}
+				
+				return Test-Path -Path "c:\Solr\solr-$using:solrVersion\bin\solr.in.cmd.old"
 			}
 			DependsOn="[Script]ExportSolrCert"
 		}
@@ -196,7 +204,11 @@ Configuration SolrServerConfig
                 }				
 			}
 			TestScript = {
-				return -Not($using:performSchemaUpdates) -or (Test-Path -Path "c:\Solr\solr-$using:solrVersion\server\solr\configsets\sitecore_main")
+				if(!$using:performSchemaUpdates){
+					return $true
+				}
+				
+				return Test-Path -Path "c:\Solr\solr-$using:solrVersion\server\solr\configsets\sitecore_main"
 			}
 		}
 		
@@ -222,7 +234,11 @@ Configuration SolrServerConfig
                 }				
 			}
 			TestScript = {
-				return -Not($using:performSchemaUpdates) -or (Test-Path -Path "c:\Solr\solr-$using:solrVersion\server\solr\configsets\sitecore_xdb")
+				if(!$using:performSchemaUpdates){
+					return $true
+				}
+			
+				return Test-Path -Path "c:\Solr\solr-$using:solrVersion\server\solr\configsets\sitecore_xdb"
 			}
 		}
 		
@@ -251,7 +267,11 @@ Configuration SolrServerConfig
 				$xml.Save($path)
 			}
 			TestScript = {
-				return -Not($using:performSchemaUpdates) -or (Test-Path -Path "c:\Solr\solr-$using:solrVersion\server\solr\configsets\sitecore_main\conf\managed-schema.old")
+				if(!$using:performSchemaUpdates){
+					return $true
+				}
+				
+				return Test-Path -Path "c:\Solr\solr-$using:solrVersion\server\solr\configsets\sitecore_main\conf\managed-schema.old"
 			}
 		}
 		

@@ -9,13 +9,27 @@ param(
 	[String]$solrPort,
     [parameter(Mandatory=$true,HelpMessage='FQDN used to serve Solr web application, e.g. mysolr.com')]
 	[String]$dns,
+    [ValidateSet("true", "false")]
     [parameter(Mandatory=$true,HelpMessage='Whether to enable https/SSL for Solr. Not all versions support this. E.g. true or false')]
-	[Boolean]$useSSL,
+	[String]$useSSL,
+    [ValidateSet("true", "false")]
     [parameter(Mandatory=$true,HelpMessage='For 6.6.2+, set to true to have Sitecore indexes and xDB indexes used a shared schema. Less than 6.6.2, set to false')]
-	[Boolean]$performSchemaUpdates
+	[String]$performSchemaUpdates
 )
 
+$useSSLBool = $false
+switch($useSSL.ToLower()) {
+    "true" { $useSSLBool = $true }
+    default { $useSSLBool = $false }
+}
+
+$performSchemaUpdatesBool = $false
+switch($performSchemaUpdates.ToLower()) {
+    "true" { $performSchemaUpdatesBool = $true }
+    default { $performSchemaUpdatesBool = $false }
+}
+
 . .\SolrServerConfig.ps1
-SolrServerConfig -artifactsLocation $PSScriptRoot -solrVersion $solrVersion -solrSslPassword $solrSslPassword -solrPort $solrPort -dns $dns -useSSL $useSSL -performSchemaUpdates $performSchemaUpdates
+SolrServerConfig -artifactsLocation $PSScriptRoot -solrVersion $solrVersion -solrSslPassword $solrSslPassword -solrPort $solrPort -dns $dns -useSSL $useSSLBool -performSchemaUpdates $performSchemaUpdatesBool
 Start-DscConfiguration -Verbose -Force -Path $PSScriptRoot\SolrServerConfig -Wait
 Remove-Item C:\Windows\System32\Configuration\Current.mof

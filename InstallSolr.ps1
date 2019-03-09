@@ -18,3 +18,4 @@ param(
 . .\SolrServerConfig.ps1
 SolrServerConfig -artifactsLocation $PSScriptRoot -solrVersion $solrVersion -solrSslPassword $solrSslPassword -solrPort $solrPort -dns $dns -useSSL $useSSL -performSchemaUpdates $performSchemaUpdates
 Start-DscConfiguration -Verbose -Force -Path $PSScriptRoot\SolrServerConfig -Wait
+Remove-Item C:\Windows\System32\Configuration\Current.mof
